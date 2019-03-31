@@ -17,20 +17,20 @@ var todoList = {
     var todo = this.todos[position];
     todo.completed = !todo.completed;
   },
-  toggleAll: function(){
+  toggleAll: function() {
     var totalTodos = this.todos.length;
     var completedTodos = 0;
-    for (var i=0; i < totalTodos; i++){
+    for (var i = 0; i < totalTodos; i++) {
       if (this.todos[i].completed === true) {
         completedTodos++;
       }
     }
     if (completedTodos === totalTodos) {
-      for (var i = 0; i <totalTodos; i++){
+      for (var i = 0; i < totalTodos; i++) {
         this.todos[i].completed = false;
       }
     } else {
-      for (var i = 0; i <totalTodos; i++){
+      for (var i = 0; i < totalTodos; i++) {
         this.todos[i].completed = true;
       }
     }
@@ -39,13 +39,13 @@ var todoList = {
 
 var handlers = {
   // we want the methods on this object to handle different clicks
-  addTodo: function(){
+  addTodo: function() {
     document.getElementById('addTodoTextInput');
     todoList.addTodo(addTodoTextInput.value);
     addTodoTextInput.value = '';
     view.displayTodos();
   },
-  changeTodo: function (){
+  changeTodo: function() {
     var changeTodoPositionInput = document.getElementById('changeTodoPositionInput');
     var changeTodoTextInput = document.getElementById('changeTodoTextInput');
     todoList.changeTodo(changeTodoPositionInput.valueAsNumber, changeTodoTextInput.value);
@@ -53,49 +53,58 @@ var handlers = {
     changeTodoTextInput.value = '';
     view.displayTodos();
   },
-  deleteTodo: function (){
-    var deleteTodoPositionInput = document.getElementById('deleteTodoPositionInput');
-    todoList.deleteTodo(deleteTodoPositionInput.valueAsNumber);
-    deleteTodoPositionInput.value = '';
+  deleteTodo: function(position) {
+    todoList.deleteTodo(position);
     view.displayTodos();
   },
-toggleCompleted: function(){
-  var toggleCompletedPositionInput = document.getElementById('toggleCompletedPositionInput');
-  todoList.toggleCompleted(toggleCompletedPositionInput.valueAsNumber);
-  toggleCompletedPositionInput.value = '';
-  view.displayTodos();
-},
-toggleAll: function() {
-  todoList.toggleAll();
-  view.displayTodos();
-}
+  toggleCompleted: function() {
+    var toggleCompletedPositionInput = document.getElementById('toggleCompletedPositionInput');
+    todoList.toggleCompleted(toggleCompletedPositionInput.valueAsNumber);
+    toggleCompletedPositionInput.value = '';
+    view.displayTodos();
+  },
+  toggleAll: function() {
+    todoList.toggleAll();
+    view.displayTodos();
+  }
 };
 //Responsible for the things that the user sees.
 var view = {
-  displayTodos: function (){
+  displayTodos: function() {
     var todosUl = document.querySelector('ul');
     todosUl.innerHTML = '';
-    for (var i = 0; i < todoList.todos.length; i++){
+    for (var i = 0; i < todoList.todos.length; i++) {
       var todoLi = document.createElement('li');
       var todo = todoList.todos[i];
-
-      //'(x) todoText'
-      // var todoTextWithCompletion = ''
-      // if (todo.completed === true){
-      // (x) todoText
-      // else {
-        //()todoText
-        // todoLi.textContent = todoTextWithCompletion;
-    //  }
-  //  }
-  var todoTextWithCompletion = '';
-  if (todo.completed === true){
-    todoTextWithCompletion = '(x)' + todo.todoText;
-  } else {
-    todoTextWithCompletion = '( )' + todo.todoText;
-  }
-   todoLi.textContent = todoTextWithCompletion;
-   todosUl.appendChild(todoLi);
+      var todoTextWithCompletion = '';
+      if (todo.completed === true) {
+        todoTextWithCompletion = '(x)' + todo.todoText;
+      } else {
+        todoTextWithCompletion = '( )' + todo.todoText;
+      }
+      todoLi.id = i;
+      todoLi.textContent = todoTextWithCompletion;
+      todoLi.appendChild(this.createDeleteButton());
+      todosUl.appendChild(todoLi);
     }
-  }
-};
+  },
+  createDeleteButton: function() {
+    var deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete';
+    deleteButton.className = 'deleteButton';
+    return deleteButton;
+  },
+  setUpEventListeners: function() {
+    var todosUl = document.querySelector('ul');
+    todosUl.addEventListener('click', function(event) {
+        // Get the element that was clicked on
+        var elementClicked = event.target;
+        //check if elementClicked is a delete deleteButton
+        if (elementClicked.className === 'deleteButton') {
+          handlers.deleteTodo(parseInt(elementClicked.parentNode.id));
+        }
+      });
+    }
+  };
+
+  view.setUpEventListeners();
